@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#111318" />
+  <title>BLACKPINK — Fanpage</title>
+  <style>
+    /* ========= THEME TOKENS ========= */
+    :root{
+      --bg: #0b0c10;
+      --surface: #111318;
+      --card: #151823;
+      --text: #e9edf1;
+      --muted: #a8b3c3;
+      --line: #222632;
+      --radius: 18px;           /* fixed radius (no UI to change) */
+      --shadow: 0 10px 28px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
+      color-scheme: dark;
+    }
+    .theme--light{
+      --bg: #f7f8fb;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --text: #0e1014;
+      --muted: #5b6472;
+      --line: #e8ecf2;
+      --shadow: 0 10px 28px rgba(16,24,40,.08), 0 2px 8px rgba(16,24,40,.04);
+      color-scheme: light;
+    }
+
+    /* ========= BASE ========= */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      background: radial-gradient(1000px 800px at 10% -10%, #0c1020 0%, transparent 60%),
+                  radial-gradient(900px 700px at 110% 110%, #131a33 0%, transparent 60%),
+                  var(--bg);
+      color: var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .container{
+      width:min(1100px, 92vw);
+      margin-inline:auto;
+      padding: 24px 0 64px;
+    }
+    header.hero{
+      display:grid;
+      gap:14px;
+      align-items:center;
+      grid-template-columns: 1fr auto;
+      padding: 28px 0 18px;
+      position: sticky;
+      top:0;
+      background: linear-gradient(to bottom, color-mix(in lab, var(--bg), transparent 0%), color-mix(in lab, var(--bg), transparent 100%));
+      backdrop-filter: blur(8px);
+      z-index: 4;
+    }
+    .title{ font-size: clamp(26px, 2.8vw, 40px); font-weight: 900; letter-spacing:.2px }
+    .subtitle{ margin-top:-6px; color: var(--muted); font-size: 14px }
+
+    /* ========= CONTROLS ========= */
+    .controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:flex-end }
+    .control{
+      display:flex; align-items:center; gap:8px;
+      background: var(--surface);
+      border:1px solid var(--line);
+      padding:10px 12px; border-radius: calc(var(--radius) - 6px);
+    }
+    .control input[type="search"]{
+      background:transparent; border:0; outline:0; color:var(--text); width:220px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--line); background: var(--surface);
+      padding:10px 14px; border-radius: calc(var(--radius) - 6px);
+      cursor:pointer; user-select:none;
+    }
+    .btn[aria-pressed="true"]{outline:2px solid #7f88ff; outline-offset:2px}
+
+    /* ========= GRID ========= */
+    .grid{
+      display:grid; grid-template-columns: 1fr; gap:18px; margin-top: 18px;
+    }
+    @media (min-width:700px){ .grid{grid-template-columns: repeat(2, 1fr)} }
+    @media (min-width:1024px){ .grid{grid-template-columns: repeat(4, 1fr)} }
+
+    /* ========= CARD (with per-card gradient fade/glow) ========= */
+    .card{
+      position: relative;
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: clip;
+      box-shadow: var(--shadow);
+      display:flex; flex-direction:column;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      isolation: isolate;
+    }
+    /* Gradient “aura” behind content */
+    .card::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(120% 120% at 100% 0%, color-mix(in lab, var(--accent, #ff66aa), transparent 70%) 0%, transparent 60%),
+        radial-gradient(120% 120% at 0% 100%, color-mix(in lab, var(--accent, #ff66aa), transparent 70%) 0%, transparent 60%);
+      filter: blur(26px) saturate(120%);
+      opacity:.9;
+      z-index:0; pointer-events:none;
+    }
+    /* Faint edge fade */
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, color-mix(in lab, var(--accent, #ff66aa), transparent 80%) 0%, transparent 60%);
+      opacity:.25; z-index:0; pointer-events:none;
+    }
+
+    .media{
+      aspect-ratio: 4/5;
+      background:
+        radial-gradient(70% 90% at 50% 10%, color-mix(in lab, var(--accent, #ff66aa), transparent 72%) 0%, transparent 70%),
+        #0b0d15;
+      display:grid; place-items:center; overflow:hidden;
+    }
+    .media img{ width:100%; height:100%; object-fit:cover; display:block; filter: saturate(1.05) contrast(1.05) }
+
+    .body{ padding:16px 16px 6px; position:relative; z-index:1 }
+    .name{ font-weight:900; font-size: 18px; letter-spacing:.2px }
+    .role{ color: var(--muted); margin-top:2px; font-size: 13.5px }
+    .facts{ display:grid; grid-template-columns: 1fr 1fr; gap:10px 14px; margin-top:12px; font-size: 13px }
+    .facts dt{ color: var(--muted) }
+    .facts dd{ margin:0; font-weight:600 }
+
+    details.bio{
+      border-top:1px dashed var(--line);
+      margin-top:12px; padding-top:12px;
+    }
+    details.bio > summary{ list-style:none; cursor:pointer; user-select:none; font-weight:700 }
+    details.bio[open] > summary{ margin-bottom:8px }
+    details.bio > p{ margin:0 0 10px; color: var(--text); font-size: 14px }
+
+    .social{ display:flex; gap:8px; padding: 10px 12px 14px; margin-top:auto; position:relative; z-index:1 }
+    .social a{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:38px; height:38px; border-radius:10px;
+      border:1px solid var(--line); background: var(--surface);
+      transition: transform .16s ease, border-color .16s ease;
+    }
+    .social a:hover{ transform: translateY(-1px); border-color: #a9b3ff }
+
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      color: #fff; background: #ff69b4;
+      padding:6px 10px; border-radius: 999px; font-size: 12px;
+      box-shadow: 0 4px 18px rgba(255,105,180,.4);
+    }
+
+    footer{
+      margin-top:28px; color: var(--muted); font-size: 13px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-top:1px solid var(--line); padding-top:16px;
+    }
+    .hidden{display:none !important}
+  </style>
+</head>
+<body class="theme--dark">
+  <div class="container">
+    <header class="hero">
+      <div>
+        <div class="title">BLACKPINK — Fanpage</div>
+        <div class="subtitle">Profiles for Jisoo, Jennie, Rosé, and Lisa.</div>
+      </div>
+
+      <div class="controls">
+        <label class="control" title="Search by name, alias, or role">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.57-4.23A6.5 6.5 0 109.5 16.5a6.471 6.471 0 004.23-1.57l.27.28v.79L19 21.49 21.49 19 15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input id="search" type="search" placeholder="Search profiles…" autocomplete="off" />
+        </label>
+
+        <button id="themeToggle" class="btn" type="button" aria-pressed="false" title="Toggle light/dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1m0 14a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1m9-5a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1M6 12a1 1 0 0 1-1 1H3a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1m11.657-6.657a1 1 0 0 1 1.415 1.414l-1.415 1.415a1 1 0 1 1-1.414-1.415zM6.343 17.657a1 1 0 0 1-1.415-1.414l1.415-1.415a1 1 0 1 1 1.414 1.415zM18.657 17.657l-1.415-1.415a1 1 0 1 1 1.414-1.414l1.415 1.415a1 1 0 0 1-1.414 1.414zM6.343 6.343 4.93 4.93A1 1 0 0 1 6.343 3.515l1.414 1.414A1 1 0 1 1 6.343 6.343z"/></svg>
+          Theme
+        </button>
+      </div>
+    </header>
+
+    <main id="grid" class="grid" aria-live="polite"></main>
+
+    <footer>
+          <span class="badge">BLINK ❤️</span>
+    </footer>
+  </div>
+
+  <!-- ========= BLACKPINK DATA ========= -->
+  <script id="profiles-data" type="application/json">
+  {
+    "profiles":[
+      {
+        "name":"Jisoo",
+        "alias":"Kim Ji-soo",
+        "role":"Lead Vocalist • Visual",
+        "photo":"https://cdn.shopify.com/s/files/1/0469/3927/5428/files/Bildschirmfoto_2024-09-03_um_12.22.45.png?v=1725359995",
+        "accent":"#8a5cf6",
+        "bio":"Jisoo’s warm tone and poised presence anchor the group’s sound. Beyond music, she’s known for acting roles and fashion ambassadorships.",
+        "facts":{
+          "Born":"Jan 3, 1995",
+          "From":"Gunpo, Gyeonggi-do, South Korea",
+          "Languages":"Korean, Japanese"
+        },
+        "social":{
+          "instagram":"https://instagram.com/sooyaaa__"
+        }
+      },
+      {
+        "name":"Jennie",
+        "alias":"Jennie Kim",
+        "role":"Main Rapper • Vocalist",
+        "photo":"https://i.pinimg.com/1200x/ca/c4/57/cac457540aad5d98065648769bc2fe8b.jpg",
+        "accent":"#ff6b6b",
+        "bio":"Jennie blends sleek rap delivery with effortless vocals. She spearheads striking solo work and high-fashion collaborations.",
+        "facts":{
+          "Born":"Jan 16, 1996",
+          "From":"Seoul, South Korea (studied in New Zealand)",
+          "Languages":"Korean, English"
+        },
+        "social":{
+          "instagram":"https://instagram.com/jennierubyjane"
+        }
+      },
+      {
+        "name":"Rosé",
+        "alias":"Park Chae-young (Roséanne)",
+        "role":"Main Vocalist • Lead Dancer",
+        "photo":"https://i.pinimg.com/1200x/b6/55/95/b65595f04fdb0f49c856eb30f3be9b0a.jpg",
+        "accent":"#ff9ec4",
+        "bio":"Rosé’s airy timbre and emotive delivery define many of the group’s biggest hooks. She also writes and performs intimate solo tracks.",
+        "facts":{
+          "Born":"Feb 11, 1997",
+          "From":"Born in Auckland, raised in Melbourne",
+          "Languages":"English, Korean"
+        },
+        "social":{
+          "instagram":"https://instagram.com/roses_are_rosie"
+        }
+      },
+      {
+        "name":"Lisa",
+        "alias":"Lalisa Manobal",
+        "role":"Main Dancer • Lead Rapper",
+        "photo":"https://i.pinimg.com/736x/1b/31/35/1b3135744a08d44afff4dbda0836fde2.jpg",
+        "accent":"#00d1b2",
+        "bio":"Lisa’s razor-precise dance and charismatic rap verses electrify stages worldwide. She leads viral choreography and global collabs.",
+        "facts":{
+          "Born":"Mar 27, 1997",
+          "From":"Buriram, Thailand",
+          "Languages":"Thai, Korean, English"
+        },
+        "social":{
+          "instagram":"https://instagram.com/lalalalisa_m"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- ========= RENDERER ========= -->
+  <script>
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+    // Save only theme pref now
+    const saved = JSON.parse(localStorage.getItem("fanpage:prefs") || "{}");
+    if(saved.theme === "light") document.body.classList.replace("theme--dark","theme--light");
+
+    const dataEl = document.getElementById("profiles-data");
+    const { profiles = [] } = JSON.parse(dataEl.textContent.trim() || "{}");
+    const grid = document.getElementById("grid");
+
+    const socialIcon = (kind) => {
+      const paths = {
+        instagram: '<path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm13 4a1 1 0 0 1 1 1v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a1 1 0 0 1 1-1h12zM17 7a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-5 2a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 9z" fill="currentColor"/>',
+        x: '<path d="M3 3h6.7l4.5 6.4L20 3h4l-7.9 8.9L24 27h-6.7l-5-7.2L9 27H5l8.2-9.3z" fill="currentColor" transform="scale(.8) translate(1,1)"/>',
+        youtube: '<path d="M10 4h12c2.2 0 4 1.8 4 4v8c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V8c0-2.2 1.8-4 4-4zm7 4-6 4 6 4V8z" fill="currentColor"/>',
+        website: '<path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 0 1 6.3 4H12V5zm-7 7a7 7 0 0 1 0-2h6V17A7 7 0 0 1 5 12zm9 7v-5h6.3A7 7 0 0 1 14 19z" fill="currentColor"/>'
+      };
+      return `<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">${paths[kind]||paths.website}</svg>`;
+    };
+
+    function factList(facts={}){
+      const entries = Object.entries(facts).filter(([k,v]) => v && String(v).trim() !== "");
+      if(!entries.length) return "";
+      const rows = entries.map(([k,v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("");
+      return `<dl class="facts">${rows}</dl>`;
+    }
+
+    function socials(links={}){
+      const order = ["instagram","x","youtube","website"];
+      const items = order
+        .filter(k => links[k] && String(links[k]).trim())
+        .map(k => `<a class="social__link" target="_blank" rel="noopener" aria-label="${k}" href="${encodeURI(links[k])}">${socialIcon(k)}</a>`);
+      return items.length ? `<div class="social">${items.join("")}</div>` : "";
+    }
+
+    function card(p){
+      const name = escapeHtml(p.name || "Unnamed");
+      const alias = p.alias ? ` • ${escapeHtml(p.alias)}` : "";
+      const role = p.role ? `<div class="role">${escapeHtml(p.role)}</div>` : "";
+      const imgSrc = p.photo || "https://placehold.co/800x1000/jpg?text=Profile";
+      const facts = factList(p.facts);
+      const bio = p.bio ? `<details class="bio"><summary>Read bio</summary><p>${escapeHtml(p.bio)}</p></details>` : "";
+      const social = socials(p.social);
+      const accent = p.accent || "#ff66aa";
+      return `
+        <article class="card" style="--accent:${accent}" data-name="${name.toLowerCase()}" data-role="${(p.role||"").toLowerCase()}" data-alias="${(p.alias||"").toLowerCase()}">
+          <figure class="media">
+            <img src="${imgSrc}" alt="${name}'s photo" loading="lazy" />
+          </figure>
+          <div class="body">
+            <div class="name">${name}<span class="alias">${alias}</span></div>
+            ${role}
+            ${facts}
+            ${bio}
+          </div>
+          ${social}
+        </article>
+      `;
+    }
+
+    function render(list){ grid.innerHTML = list.map(card).join(""); }
+
+    function escapeHtml(str=""){
+      return String(str)
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    // Initial render
+    render(profiles);
+
+    // Search filter
+    $("#search").addEventListener("input", (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      $$(".card", grid).forEach(c=>{
+        const hay = [c.dataset.name, c.dataset.role, c.dataset.alias].join(" ");
+        c.classList.toggle("hidden", q && !hay.includes(q));
+      });
+    });
+
+    // Theme toggle
+    const themeBtn = $("#themeToggle");
+    const setTheme = (mode) => {
+      const light = mode === "light";
+      document.body.classList.toggle("theme--light", light);
+      document.body.classList.toggle("theme--dark", !light);
+      themeBtn.setAttribute("aria-pressed", String(light));
+      persist();
+    };
+    themeBtn.addEventListener("click", ()=>{
+      const isLight = document.body.classList.contains("theme--light");
+      setTheme(isLight ? "dark" : "light");
+    });
+
+    function persist(){
+      const prefs = {
+        theme: document.body.classList.contains("theme--light") ? "light" : "dark"
+      };
+      localStorage.setItem("fanpage:prefs", JSON.stringify(prefs));
+    }
+  </script>
+</body>
+</html>
